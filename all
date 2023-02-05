@@ -1,0 +1,286 @@
+
+# ################## FORK OR ZOMBIE , ORPHAN BAZZI #################
+# ##################################################################
+
+
+
+# #============  simple child process
+# import os
+# retval = os.fork()
+# if retval == 0:
+#     print("child process is running")
+#     print("child prcoess ended"+ os.pid())
+# else:
+#     os.wait()
+#     print("child process ended")
+#     print("parent process now running")
+
+
+# #============ zombie process 10 second wait
+
+# import os
+# import time
+
+# pid = os.fork()
+
+# if pid == 0:
+#     # This is the child process
+#     print("Child process, pid =", os.getpid())
+#     # Exit immediately, becoming a zombie process
+#     os._exit(0)
+# else:
+#     # This is the parent process
+#     print("Parent process, pid =", os.getpid())
+#     # Wait for 10 seconds
+#     time.sleep(10)
+#     # Check the status of the child process
+#     pid, status = os.waitpid(pid, os.WSTOPSIG | os.WEXITED)
+#     print("Child process has finished with status:", status)
+
+
+
+# #============ child k 2 child
+
+# import os
+# import time
+
+# created_processes = []
+
+# pid = os.fork()
+
+# if pid == 0:
+#     # This is the first child process
+#     print("First child process, pid =", os.getpid())
+#     created_processes.append(os.getpid())
+
+#     # Create the second child process
+#     pid1 = os.fork()
+#     if pid1 == 0:
+#         # This is the second child process
+#         print("Second child process, pid =", os.getpid())
+#         created_processes.append(os.getpid())
+
+#         # Create the third child process
+#         pid2 = os.fork()
+#         if pid2 == 0:
+#             # This is the third child process
+#             print("Third child process, pid =", os.getpid())
+#             created_processes.append(os.getpid())
+
+#             # Exit immediately
+#             os._exit(0)
+#         else:
+#             # Wait for the third child process to exit
+#             pid3, status = os.waitpid(pid2, os.WSTOPSIG | os.WEXITED)
+#             print("Third child process has finished with pid:", pid3)
+#             # Exit immediately
+#             os._exit(0)
+#     else:
+#         # Wait for the second child process to exit
+#         pid2, status = os.waitpid(pid1, os.WSTOPSIG | os.WEXITED)
+#         print("Second child process has finished with pid:", pid2)
+#         # Exit immediately
+#         os._exit(0)
+# else:
+#     # Wait for the first child process to exit
+#     pid1, status = os.waitpid(pid, os.WSTOPSIG | os.WEXITED)
+#     print("First child process has finished with pid:", pid1)
+#     # Print the list of created processes
+#     print("Created processes:", created_processes)
+
+
+# #============ array create in parent , sort in child
+
+# import os
+# import time
+
+# # Initialize the array in the parent process
+# arr = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5]
+# print("Array before sorting:", arr)
+
+# pid = os.fork()
+
+# if pid == 0:
+#     # This is the child process
+#     print("Child process, pid =", os.getpid())
+
+#     # Sort the array
+#     arr.sort()
+
+#     # Wait for 1 second
+#     time.sleep(1)
+#     print("Array after sorting:", arr)
+#     # Exit immediately
+#     os._exit(0)
+# else:
+#     # This is the parent process
+#     print("Parent process, pid =", os.getpid())
+
+#     # Wait for the child process to exit
+#     os.wait()
+
+#     # Wait for 1 second
+#     time.sleep(1)
+#     print("Array after sorting:", arr)
+
+
+
+
+# ################## THREADING #################
+# ##################################################################
+
+# #============  2 thread aik sey name aik sey roll no
+
+# import threading
+# def name_fun(name):
+#     print(f"hello studentName{name}")
+# def roll_fun(roll):
+#     print(f"student roll no is",roll)
+
+
+# t1 = threading.Thread(target=name_fun,args=("name",))
+# t2 = threading.Thread(target=roll_fun,args=(1,));
+# t1.start()
+# t2.start()
+# t2.join()
+# t2.join()
+
+
+# #============  no of threads by user
+
+# def create_tr(n):
+#     print(f"hello \n thread number : {n}")
+
+
+# n = int(input("enter no of thread :  "))
+# thread_li = []
+# for i in range(n):
+#     t1 =threading.Thread(target=create_tr,args = (i,))
+#     t1.start()
+#     thread_li.append(t1)
+
+# for i in thread_li:
+#     i.join()
+
+
+
+
+
+# ################## SEMAPHORE #################
+# ##################################################################
+
+# #============ PRODUCER CONSUMER 
+
+# import threading 
+# import random 
+# import time 
+
+# buf = [] 
+# empty = threading.Semaphore(5) 
+# full = threading.Semaphore(0) 
+# mutex = threading.Lock() 
+
+
+# def producer(): 
+#     nums = range(5) 
+#     global buf 
+#     num = random.choice(nums) 
+#     empty.acquire() # EMPTY ME -1
+#     mutex.acquire() # LOCK KARDIA SHARED RESOURCE KO 
+#     #TAKE KOI OR ACCESS NA KAR SAKE
+#     buf.append(num) 
+#     print("Produced", num, buf) 
+#     mutex.release() # added 
+#     full.release()  # FUL ME +1
+
+
+# def consumer(): 
+#     global buf 
+#     full.acquire() 
+#     mutex.acquire() # added 
+#     num = buf.pop(0) 
+#     print("Consumed", num, buf) 
+#     mutex.release() # added 
+#     empty.release() 
+
+
+
+# consumerThread1 = threading.Thread(target=consumer)
+# producerThread1 = threading.Thread(target=producer) 
+# consumerThread2 = threading.Thread(target=consumer)
+# producerThread2 = threading.Thread(target=producer) 
+# producerThread3 = threading.Thread(target=producer) 
+# producerThread4 = threading.Thread(target=producer) 
+# producerThread5 = threading.Thread(target=producer) 
+# producerThread6 = threading.Thread(target=producer)
+
+
+
+# consumerThread1.start() 
+# consumerThread2.start() 
+# producerThread1.start() 
+# producerThread2.start()
+# producerThread3.start()
+# producerThread4.start()
+# producerThread5.start()
+# producerThread6.start()
+
+
+# consumerThread1.join() 
+# consumerThread2.join() 
+# producerThread1.join() 
+# producerThread2.join()
+# producerThread3.join()
+# producerThread4.join()
+# producerThread5.join()
+# producerThread6.join()
+
+
+#============ READ WRITE BINARY SEMAPHORE
+
+
+import threading
+import time
+
+readers_count = 0 # kitne reader hein db me
+
+
+db = threading.Semaphore(1)
+mutex = threading.Lock() 
+
+def reader(id):
+    global readers_count
+    mutex.acquire()
+    readers_count += 1
+    if readers_count == 1:
+        db.acquire()
+    mutex.release()
+
+    # Reading is taking place
+    print("Reader %d is reading the database." % id)
+    time.sleep(1)
+
+    mutex.acquire()
+    readers_count -= 1
+    if readers_count == 0:
+        db.release()
+    mutex.release()
+
+def writer(id):
+    db.acquire()
+    # Writing is taking place
+    print("Writer %d is writing to the database." % id)
+    time.sleep(1)
+    db.release()
+
+reader_threads = [threading.Thread(target=reader, args=(i,)) for i in range(5)]
+writer_threads = [threading.Thread(target=writer, args=(i,)) for i in range(2)]
+for t in writer_threads + reader_threads :
+    t.start()
+
+for t in reader_threads + writer_threads:
+    t.join()
+
+
+
+
