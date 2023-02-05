@@ -306,3 +306,337 @@ for t in reader_threads + writer_threads:
 
 
 
+
+
+###################### INTERPROCESS COMMUNCITON PIPE  ##################################################################
+##############################################################################################################
+
+import os
+
+r,w = os.pipe()
+ret = os.fork()
+
+if ret > 0:
+	os.close(r)
+	
+	print("parent")
+	text = "hello child ".encode()
+	
+	os.write(w,text)
+	os.close(w)	
+	
+else:
+	os.close(w)
+	print("child")
+	cr = os.fdopen(r)
+	
+	print(cr.read())
+
+
+# ================ LAB 11 PARENT CHILD KI COMMUNICATION THROUGH MULTIPROCESSING =====================
+
+try:
+	from multiprocessing import Process,Pipe
+except:
+	os.system("pip install multiprocessing")
+
+
+def f(child_conn):
+	print(child_conn.recv())
+	child_conn.send("hello parent")
+	child_conn.close()
+	
+p_conn,c_conn = Pipe()
+p_conn.send("hello child")
+
+p1 = Process(target = f,args= (c_conn,))
+
+p1.start()
+p1.join()
+
+print(p_conn.recv())
+p_conn.close()
+
+
+
+#======================== LAB 11 PARENT LIST BANA RAH CHILD SORT KARRAH ============================
+
+from multiprocessing import Process, Array, Value,Pipe
+
+def child_process(arr,n,c):
+	arr = sorted(arr[:],reverse = True)
+	print(arr[:])
+	for i in range(len(arr)):
+		arr[i] = -arr[i]
+	n = n.value + 1.1
+	
+	print("abba ne ye bola ",c.recv())
+	c.send((arr,n))
+	c.close()
+	
+p_conn,c_conn = Pipe()
+p_conn.send("chal shaba reverse sort kar ke de or value me +1")
+
+arr = Array('i',range(10))
+print(arr[:])
+n = Value('d',2.0)
+p1 = Process(target = child_process, args = (arr,n,c_conn,))
+
+p1.start()
+p1.join()
+print(p_conn.recv())
+p_conn.close()
+
+
+
+#======================== Lab 11 os.pipe se do pipe bana raahe=========================
+
+
+import os
+
+r,w = os.pipe()
+r2,w2 = os.pipe()
+pid = os.fork()
+
+if pid > 0:
+	os.close(w2) #un-necessary chezon ko pehle band kro
+	os.close(r)
+	print('Parent process is writing')	
+	text = 'Hello child proces'.encode()
+	os.write(w,text)
+	os.close(w)
+	pr = os.fdopen(r2)
+	print('Child has sent ',pr.read()) 
+	
+else:
+	os.close(w) #un-necessary chezon ko pehle band kro
+	os.close(r2)
+	print('\nChild process ')
+	cr = os.fdopen(r)
+	print('Read', cr.read())
+	print('\nChild process is sending regards')
+	text = 'Thankyou'.encode()
+	os.write(w2,text)
+	os.close(w2)
+
+
+##LAB 11 5 FUNCTIONS ME SHARED VALUE JA RAHI OR +1 HO RAH
+
+from multiprocessing import Process,Value
+
+def t1(value):
+	
+	value.value +=1
+def t2(value):
+	
+	value.value +=1
+def t3(value):
+	
+	value.value +=1
+def t4(value):
+	
+	value.value +=1
+def t5(value):
+	
+	value.value +=1
+v = Value('i',0)
+print(v.value)
+p1 = Process(target = t1,args = (v,))
+p2 = Process(target = t2,args = (v,))
+p3 = Process(target = t3,args = (v,))
+p4 = Process(target = t4,args = (v,))
+p5 = Process(target = t5,args = (v,))
+
+
+p1.start()
+p2.start()
+p3.start()
+p4.start()
+p5.start()
+
+p1.join()
+p2.join()
+p3.join()
+p4.join()
+p5.join()
+
+print(v.value)
+
+
+LAB 12                     2 PROCESSES BAN RAHE DONO ME ADHI ADHI LIST JA  RAHI OR SQUARE HO RAH
+
+from multiprocessing import Process,Array
+import random
+def square(arr,i,j):
+	print(arr[i:j])
+	for i in range(i,j):
+		arr[i] = arr[i] **2
+
+arr = Array('i',[0,1,2,3,4,5,6,7,8,9]) 
+print(arr[:])
+p1 = Process(target = square,args = (arr,0,len(arr[:])//2,))
+p2 = Process(target = square,args = (arr,(len(arr[:])//2),len(arr[:]),))
+
+p1.start()
+p2.start()
+p1.join()
+p2.join()
+print(arr[:])
+
+
+
+COMMAND LINE SE INPUT LE RAHE
+
+import sys
+from multiprocessing import Process,Pipe
+
+def parent(conn,name):
+	print("parent")
+	conn.send(name)
+	conn.close()
+def child(conn):
+	print("child")
+	print(conn.recv())
+	conn.close()
+	
+name= sys.argv[1]
+p_conn,c_conn = Pipe()
+p = Process(target = parent, args = (p_conn,name,))
+c = Process(target = child, args = (c_conn,))
+
+
+p.start()
+c.start()
+
+p.join()
+c.join()
+
+
+
+###################### MULTIPROCESS INTERPROCESS SHARED MEMORY ##################################################################
+##############################################################################################################
+
+
+
+
+# LAB 12 =================================== 2 PROCESSES BAN RAHE DONO ME ADHI ADHI LIST JA  RAHI OR SQUARE HO RAH =======================
+
+from multiprocessing import Process,Array
+import random
+def square(arr,i,j):
+	print(arr[i:j])
+	for i in range(i,j):
+		arr[i] = arr[i] **2
+
+arr = Array('i',[0,1,2,3,4,5,6,7,8,9]) 
+print(arr[:])
+p1 = Process(target = square,args = (arr,0,len(arr[:])//2,))
+p2 = Process(target = square,args = (arr,(len(arr[:])//2),len(arr[:]),))
+
+p1.start()
+p2.start()
+p1.join()
+p2.join()
+print(arr[:])
+
+
+
+# ============================ COMMAND LINE SE INPUT LE RAHE ======================================================
+
+
+import sys
+from multiprocessing import Process,Pipe
+
+def parent(conn,name):
+	print("parent")
+	conn.send(name)
+	conn.close()
+def child(conn):
+	print("child")
+	print(conn.recv())
+	conn.close()
+	
+name= sys.argv[1]
+p_conn,c_conn = Pipe()
+p = Process(target = parent, args = (p_conn,name,))
+c = Process(target = child, args = (c_conn,))
+
+
+p.start()
+c.start()
+
+p.join()
+c.join()
+
+
+
+###################### BANKER ALGORITHM  ##################################################################
+##############################################################################################################
+
+def is_safe_state(processes, avail, need, allot):
+    """
+    Check if the system is in a safe state
+    :param processes: Number of processes
+    :param avail: Available resources
+    :param need: Need matrix for each process
+    :param allot: Allocation matrix for each process
+    :return: True if safe state, False otherwise
+    """
+    # Mark all processes as infeasible
+    finish = [False] * processes
+
+    # To store safe sequence
+    safe_seq = [0] * processes
+
+    # Make a copy of available resources
+    work = [0] * len(avail)
+    for i in range(len(avail)):
+        work[i] = avail[i]
+
+    # While all processes are not finished or system is not in safe state
+    count = 0
+    while count < processes:
+        # Find a process which is not finish and whose needs can be satisfied with current work[]
+        found = False
+        for p in range(processes):
+            if finish[p] == False and need[p][:len(work)] <= work:
+                # Add the allocated resources of current P to the available/work resources i.e. free the resources
+                for j in range(len(work)):
+                    work[j] += allot[p][j]
+
+                # Add this process to safe sequence.
+                safe_seq[count] = p
+                count += 1
+
+                # Mark this p as finished
+                finish[p] = True
+                found = True
+
+        # If we could not find a next process in safe sequence.
+        if found == False:
+            print("System is not in safe state")
+            return False
+
+    # If system is in safe state then safe sequence will be as below
+    print("System is in safe state.\nSafe sequence is: ", end=" ")
+    print(*safe_seq)
+
+    return True
+
+# Driver code
+if __name__ == '__main__':
+    processes = 5
+    avail = [3, 3, 2]
+    max_res = [[7, 5, 3], [3, 2, 2], [9, 0, 2], [2, 2, 2], [4, 3, 3]]
+    allot = [[0, 1, 0], [2, 0, 0], [3, 0, 2], [2, 1, 1], [0, 0, 2]]
+
+    # Calculate the need matrix
+    need = []
+    for i in range(processes):
+        n = [max_res[i][j] - allot[i][j] for j in range(len(avail))]
+        need.append(n)
+
+    # Check system is in safe state or not
+    is_safe_state(processes, avail, need, allot)
+
+
